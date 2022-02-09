@@ -2,6 +2,9 @@
 param (
     [Parameter()]
     [String]
+    [ValidateSet("x86_64-pc-windows-msvc", "x86_64-pc-windows-gnu")]
+    $HostTriple="x86_64-pc-windows-msvc",
+    [String]
     $ToolchainVersion = '1.58.0.0',
     [String]
     [ValidateSet("xtensa-esp32-espidf", "xtensa-esp32s2-espidf", "xtensa-esp32s3-espidf", "riscv32imc-esp-espidf")]
@@ -25,6 +28,7 @@ $RustStdDemo = "rust-esp32-std-demo"
 
 "Processing configuration:"
 "-Features         = ${Features}"
+"-HostTriple       = ${HostTriple}"
 "-LlvmVersion      = ${LlvmVersion}"
 "-Target           = ${Target}"
 "-ToolchainVersion = ${ToolchainVersion}"
@@ -37,6 +41,7 @@ $ExportFile="Export-Rust-${ToolchainName}.ps1"
 
 if ("skip" -ne $InstallationMode) {
     ./Install-RustToolchain.ps1 `
+        -HostTriple ${HostTriple} `
         -ExportFile ${ExportFile} `
         -LlvmVersion ${LlvmVersion} `
         -InstallationMode ${InstallationMode} `
