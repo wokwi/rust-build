@@ -4,14 +4,17 @@ param (
     [String]
     $ExportFile = '',
     [String]
-    $ToolchainVersion = '1.58.0.0',
+    [ValidateSet("x86_64-pc-windows-msvc", "x86_64-pc-windows-gnu")]
+    $HostTripple="x86_64-pc-windows-msvc",
     [String]
-    $ToolchainDestination = "${HOME}/.rustup/toolchains/esp",
+    [ValidateSet("install", "reinstall", "uninstall", "export")]
+    $InstallationMode = 'install',
     [String]
     $LlvmVersion = "esp-13.0.0-20211203",
     [String]
-    [ValidateSet("install", "reinstall", "uninstall", "export")]
-    $InstallationMode = 'install'
+    $ToolchainDestination = "${HOME}/.rustup/toolchains/esp",
+    [String]
+    $ToolchainVersion = '1.58.0.0'
 )
 
 $ErrorActionPreference = "Stop"
@@ -24,14 +27,16 @@ $EspFlashUrl="https://github.com/esp-rs/espflash/releases/latest/download/cargo-
 $EspFlashBin="${env:USERPROFILE}\.cargo\bin\cargo-espflash.exe"
 
 "Processing configuration:"
+"-ExportFile           = ${ExportFile}"
 "-InstalltationMode    = ${InstallationMode}"
+"-HostTriple           = ${HostTriple}"
 "-LlvmVersion          = ${LlvmVersion}"
 "-ToolchainVersion     = ${ToolchainVersion}"
 "-ToolchainDestination = ${ToolchainDestination}"
 
 function InstallRust() {
     Invoke-WebRequest https://win.rustup.rs/x86_64 -OutFile rustup-init.exe
-    ./rustup-init.exe --default-toolchain stable -y
+    ./rustup-init.exe --default-toolchain stable -y --default-host "${HostTriple}"
     $env:PATH+=";$env:USERPROFILE\.cargo\bin"
     $ExportContent+="`n" + '$env:PATH+=";$env:USERPROFILE\.cargo\bin"'
 }
@@ -82,7 +87,7 @@ if ((rustfmt --version | Select-String -Pattern stable).Length -eq 0) {
 }
 
 $Arch="x86_64-pc-windows-msvc"
-$RustDist="rust-${ToolchainVersion}-${Arch}"
+$RustDist="rust-${ToolchainVersion}-${HostTriple}"
 $RustDistZipUrl="https://github.com/esp-rs/rust-build/releases/download/v${ToolchainVersion}/${RustDist}.zip"
 $IdfToolsPath="${HOME}/.espressif"
 $IdfToolXtensaElfClang="${IdfToolsPath}/tools/xtensa-esp32-elf-clang/${LlvmVersion}-${Arch}"
