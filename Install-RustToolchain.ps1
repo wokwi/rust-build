@@ -5,7 +5,7 @@ param (
     $ExportFile = '',
     [String]
     [ValidateSet("x86_64-pc-windows-msvc", "x86_64-pc-windows-gnu")]
-    $HostTripple="x86_64-pc-windows-msvc",
+    $HostTriple="x86_64-pc-windows-msvc",
     [String]
     [ValidateSet("install", "reinstall", "uninstall", "export")]
     $InstallationMode = 'install',
