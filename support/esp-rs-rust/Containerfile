@@ -49,11 +49,14 @@ RUN echo 'embuild = { git="https://github.com/ivmarkov/embuild.git" }' >> rust-p
 RUN sed -i -e 's!esp-13.0.0-20211203-aarch64-unknown-linux-gnu/!esp-13.0.0-20211203-aarch64-unknown-linux-gnu/xtensa-esp32-elf-clang/!g' /home/rust/export-rust.sh
 #RUN git clone https://github.com/espressif/rust-esp32-example.git
 
+RUN pip3 install esptool --user
 
 # Compile the example, this will cache .embuild and .espressif including crates
 RUN . /opt/esp/entrypoint.sh \
    && cd rust-project \
    && cargo build --features "native" --release
+
+COPY support/esp-rs-rust/compile.sh /home/rust
 
 #RUN cd rust-esp32-example \
 #  && . /opt/esp/entrypoint.sh \
